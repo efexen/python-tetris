@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from block import Block
+from world import World
 
 class Tetris:
 
@@ -21,26 +22,28 @@ class Tetris:
         self.difficulty = 30
 
     def set_sizes(self):
-        self.world_width = 10
+        world_width = 10
 
         display_info = pygame.display.Info()
         candidate_width = int(display_info.current_h * 0.5)
 
-        self.width = (candidate_width // self.world_width) * self.world_width
-        self.height = (int(display_info.current_h * 0.8) // self.world_width) * self.world_width
+        self.width = (candidate_width // world_width) * world_width
+        self.height = (int(display_info.current_h * 0.8) // world_width) * world_width
 
-        self.block_size = self.width / self.world_width
-        self.world_height = self.height / self.block_size
+        self.block_size = self.width / world_width
+        world_height = self.height / self.block_size
+
+        self.world = World(world_width, world_height)
 
     def new_block(self):
-        self.active_block = Block(self.block_size, self.world_width, self.world_height)
+        self.active_block = Block(self.block_size, self.world)
         self.blocks.append(self.active_block)
 
     def check_events(self):
         for event in pygame.event.get():
             self.handle_event(event)
 
-    def quit(self):
+    def quit(self, _event):
         self.running = False
 
     def keydown(self, event):
@@ -49,7 +52,7 @@ class Tetris:
         elif event.key == K_RIGHT:
             self.active_block.move_right()
         elif event.key == K_DOWN:
-            self.active_block.update()
+            self.active_block.move_down()
         elif event.key == K_ESCAPE:
             self.quit(event)
 
