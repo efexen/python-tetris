@@ -13,9 +13,7 @@ class Tetris:
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.clock = pygame.time.Clock()
 
-        self.blocks = []
-
-        self.new_block()
+        self.block = Block(self.block_size, self.world)
 
         self.running = True
         self.frame_counter = 0
@@ -33,11 +31,7 @@ class Tetris:
         self.block_size = self.width / world_width
         world_height = self.height / self.block_size
 
-        self.world = World(world_width, world_height)
-
-    def new_block(self):
-        self.active_block = Block(self.block_size, self.world)
-        self.blocks.append(self.active_block)
+        self.world = World(world_width, world_height, self.block_size)
 
     def check_events(self):
         for event in pygame.event.get():
@@ -48,11 +42,11 @@ class Tetris:
 
     def keydown(self, event):
         if event.key == K_LEFT:
-            self.active_block.move_left()
+            self.block.move_left()
         elif event.key == K_RIGHT:
-            self.active_block.move_right()
+            self.block.move_right()
         elif event.key == K_DOWN:
-            self.active_block.move_down()
+            self.block.move_down()
         elif event.key == K_ESCAPE:
             self.quit(event)
 
@@ -63,21 +57,15 @@ class Tetris:
         }.get(event.type, lambda _: None)(event)
 
     def update(self):
-        for block in self.blocks:
-            if block.active:
-                block.update()
+        self.block.update()
 
     def draw(self):
         self.screen.fill((0, 0, 0))
 
-        for block in self.blocks:
-            block.draw(self.screen)
+        self.world.draw(self.screen)
+        self.block.draw(self.screen)
 
         pygame.display.flip()
-
-    def check_state(self):
-        if not self.active_block.active:
-            self.new_block()
 
     def play(self):
         while(self.running):
@@ -86,7 +74,6 @@ class Tetris:
             if self.frame_counter % self.difficulty == 0:
                 self.update()
 
-            self.check_state()
             self.draw()
             self.clock.tick(60)
             self.frame_counter += 1

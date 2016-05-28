@@ -6,9 +6,11 @@ class Block():
     def __init__(self, size, world):
         self.world = world
         self.size = size
-        self.x = randint(0, world.width - 1)
+        self.regen()
+
+    def regen(self):
+        self.x = randint(0, self.world.width - 1)
         self.y = -1
-        self.active = True
 
     def move_left(self):
         if (self.x > 0 and not self.world.blocked_at(self.x - 1, self.y)):
@@ -30,8 +32,8 @@ class Block():
         self.y += 1
 
     def settle(self):
-        self.active = False
         self.world.set_block_at(self.x, self.y)
+        self.regen()
 
     def update(self):
         self.move_down()
