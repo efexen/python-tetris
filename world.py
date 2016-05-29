@@ -17,11 +17,17 @@ class World():
 
         self.check_row(y)
 
+    def increment_keys_above(self, current_key, key, values):
+        if key < current_key:
+            return (key + 1, values)
+        else:
+            return (key, values)
+
     def check_row(self, y):
         if len(self._positions.get(y)) == 10:
             del self._positions[y]
 
-            self._positions = dict(map(lambda (k, v): (k + 1, v), self._positions.iteritems()))
+            self._positions = dict(map(lambda (k, v): self.increment_keys_above(y, k, v), self._positions.iteritems()))
 
     def blocked_at(self, x, y):
         return self._positions.get(y, {}).get(x, False)
