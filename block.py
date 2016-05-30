@@ -15,28 +15,35 @@ class Block():
         self.x = randint(0, self.world.width - self.block_type.width())
         self.y = -self.block_type.height()
 
-    def move_left(self): # update to check parts
-        if (self.x > 0 and not self.world.blocked_at(self.x - 1, self.y)):
+    def move_left(self):
+        blocked = False
+
+        for part in self.block_type.parts(self.x, self.y):
+            if (part.x == 0 or self.world.blocked_at(part.x - 1, part.y)):
+                blocked = True
+
+        if not blocked:
             self.x -= 1
 
     def move_right(self): # update to check parts
         if (self.x < self.world.width - self.block_type.width() and not self.world.blocked_at(self.x + 1, self.y)):
             self.x += 1
 
-    def move_down(self): # update to check parts
-        if self.y >= (self.world.height - (self.block_type.height() - 1)):
-            self.settle()
-            return
+    def move_down(self):
+        settled = False
 
-        if self.world.blocked_at(self.x, self.y + 1):
-            self.settle()
-            return
+        for part in self.block_type.parts(self.x, self.y):
+            if part.y >= self.world.height or self.world.blocked_at(part.x, part.y + 1):
+                settled = True
 
-        self.y += 1
+        if settled:
+            self.settle()
+        else:
+            self.y += 1
 
     def settle(self):
-        for (offset_x, offset_y) in self.block_type.parts():
-            self.world.set_block_at(self.x + offset_x, self.y + offset_y)
+        for part in self.block_type.parts(self.x, self.y):
+            self.world.set_block_at(part.x, part.y)
 
         self.regen()
 
@@ -45,5 +52,5 @@ class Block():
         print(self.world._positions)
 
     def draw(self, screen):
-        for (offset_x, offset_y) in self.block_type.parts():
-            pygame.draw.rect(screen, (10, 200, 10), ((self.x + offset_x) * self.size, (self.y + offset_y) * self.size, self.size, self.size))
+        for part in self.block_type.parts(self.x, self.y):
+            pygame.draw.rect(screen, (10, 200, 10), (part.x * self.size, part.y * self.size, self.size, self.size))

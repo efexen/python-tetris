@@ -1,3 +1,7 @@
+from collections import namedtuple
+
+BlockPart = namedtuple("BlockPart", "x y")
+
 class BlockType():
 
     block_types = {
@@ -22,5 +26,6 @@ class BlockType():
     def height(self):
         return self.block_types[self.type_id]['height']
 
-    def parts(self):
-        return self.block_types[self.type_id]['parts']
+    def parts(self, origin_x, origin_y):
+        for (part_x, part_y) in self.block_types[self.type_id]['parts']:
+            yield BlockPart(origin_x + part_x, origin_y + part_y)
