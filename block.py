@@ -10,7 +10,7 @@ class Block():
         self.regen()
 
     def regen(self):
-        self.block_type = BlockType(randint(0, 1))
+        self.block_type = BlockType(randint(0, 7))
 
         self.x = randint(0, self.world.width - self.block_type.width())
         self.y = -self.block_type.height()
@@ -25,8 +25,14 @@ class Block():
         if not blocked:
             self.x -= 1
 
-    def move_right(self): # update to check parts
-        if (self.x < self.world.width - self.block_type.width() and not self.world.blocked_at(self.x + 1, self.y)):
+    def move_right(self):
+        blocked = False
+
+        for part in self.block_type.parts(self.x, self.y):
+            if (part.x == self.world.width - 1 or self.world.blocked_at(part.x + 1, part.y)):
+                blocked = True
+
+        if not blocked:
             self.x += 1
 
     def move_down(self):
@@ -49,7 +55,6 @@ class Block():
 
     def update(self):
         self.move_down()
-        print(self.world._positions)
 
     def draw(self, screen):
         for part in self.block_type.parts(self.x, self.y):

@@ -10,7 +10,7 @@ class World():
 
     def set_block_at(self, x, y):
         if self._positions.get(y):
-            if not self._positions.get(x):
+            if not self._positions[y].get(x):
                 self._positions[y][x] = True
         else:
             self._positions[y] = { x: True }
